@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!=include('app/css/app.css')?>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>   
+  </head>
+  <body>
+    <div id="Header">CCS Lunch Count Report</div>
+    <div id="range-bar">
+      <span>View report for:</span>
+      <span>
+        <select id="range-select">
+         <option value="day" selected="selected" >Today</option>
+         <option value="week">This Week</option>
+         <option value="month">This Month</option>
+         <option value="year">This Year</option>
+         <option value="custom">Custom</option>
+        </select>
+      </span>
+      <span id="range-custom-fields" hidden>
+       <span>Start Date: </span><span><input id="range-start-date" type="date"> </span> 
+       <span>End Date: </span><span><input id="range-end-date" type="date"> </span> 
+       <span><input id="range-submit-button" type="button" value="Search"> </span> 
+      </span>      
+    </div>
+    <div id="table-containter">
+      <table id="report-table">
+        <thead>
+         <tr></tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>       
+      </tfoot>
+      </table>      
+    </div>
+  </body>   
+   <?!=include('app/js/app.js')?>
+</html>
+
+

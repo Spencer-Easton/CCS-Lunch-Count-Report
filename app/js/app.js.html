@@ -1,0 +1,127 @@
+<script>
+    
+    //Get Initial Data Set. Default is "todays"
+     var headers; 
+     var data;
+    google.script.run.withSuccessHandler(
+         function(val){
+         headers = val;
+           loadHeaders();
+           google.script.run.withSuccessHandler(
+             function(val){
+             data = val;             
+             loadRows();
+             loadFooter();
+             }).getRangeData();
+         }).getHeaders();
+ 
+ 
+ 
+ 
+ // set up events
+ $(function(){
+   var dateNav = $("#range-custom-fields");
+   var startDate = $('#range-start-date');
+   var endDate = $('#range-end-date');       
+      
+   //Init the data inputs from 7 days ago till today 
+   var now = new Date();      
+   startDate[0].valueAsDate =  new Date(new Date().setDate(now.getDate() - 7));
+   endDate[0].valueAsDate = now;
+   
+   
+   $("#range-select").change(function(){
+     if($(this).val() === "custom"){
+       dateNav.show();
+     }else{
+       dateNav.hide();
+       google.script.run.withSuccessHandler(
+          function(val){
+             data = val;
+             clearTable();
+             loadRows();
+             loadFooter();
+          }).getRangeData($(this).val());
+     }
+   });
+      
+   $('#range-submit-button').click(function(){
+       var startDate = $('#range-start-date');
+       var endDate = $('#range-end-date');       
+     google.script.run.withSuccessHandler(
+         function(val){
+             data = val;
+             clearTable();
+             loadRows();
+             loadFooter();
+         }).getCustomRangeData( startDate.val(),endDate.val());    
+   });
+});
+
+
+
+function loadHeaders(){
+  var thead = $('#report-table thead tr')
+  for(var i in headers[0]){
+    thead.append('<th class="tableHeader">'+ headers[0][i]+'</th>'); 
+  }
+}
+
+// This sums the columns that are not marked as skipfields.
+function loadFooter(){
+  var skipFields = ["Timestamp","Email Address","Teacher's Choice","Comments..."];
+  var totals = [];
+  var colTotals = Array.apply(null, Array(data[0].length)).map(Number.prototype.valueOf,0);  
+  for(var i in data){      
+    for(var ii = 0; ii < data[i].length; ii++){        
+      if(skipFields.indexOf(headers[0][ii]) == -1){        
+        if(data[i][ii] !== ""){
+          colTotals[ii] += data[i][ii];  
+        }else{
+          colTotals[ii] += 0;
+        }
+        
+      }else{
+        colTotals[ii] = "-";
+      }
+    }    
+  }
+  
+   // make the DOM changes
+   var tFoot = $('#report-table tfoot');
+   var tRow = $('<tr>');
+   var tRowHeader = $('<tr>').css("border-top","solid 1px").append($('<td>').append("<span />").text("Totals"));   
+   for(var col in colTotals){
+     tRow.append($('<td>').append("<span />").text(colTotals[col]));
+   }
+   tFoot.append(tRowHeader);
+   tFoot.append(tRow);
+}
+
+function clearTable(){
+  $("#report-table > tbody").html("");
+  $("#report-table > tfoot").html("");
+  
+}
+
+function loadRows(){
+  var tBody = $('#report-table tbody')
+  
+  for(var i in data){ //set row color
+    var cssClass;
+    if(i%2 == 0){
+      cssClass = "#E8F5E9";
+    }else{
+      cssClass = "#ffffff";
+    }
+   
+   var tRow = $('<tr>').css("background-color",cssClass);
+    for(var ii in data[i]){
+      tRow.append($('<td>').append("<span/>").text(data[i][ii]));          
+    }
+    tBody.append(tRow);
+  }  
+} 
+</script>
+
+
